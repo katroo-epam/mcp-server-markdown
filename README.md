@@ -6,15 +6,21 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue.svg)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Search, navigate, and extract content from markdown files — full-text search, section extraction, heading navigation, code block discovery, and frontmatter parsing.
+Search, navigate, and extract content from local markdown files. Full-text search, section extraction, heading navigation, code block discovery, and frontmatter parsing.
 
 ```bash
 npx mcp-server-markdown
 ```
 
-> Works with Claude Desktop, Cursor, VS Code Copilot, and any MCP client. Zero auth — reads local markdown files.
+> Works with Claude Desktop, Cursor, VS Code Copilot, and any MCP client. Reads local `.md` files, no auth needed.
 
-![Demo](assets/demo.gif)
+![MCP server for searching and navigating markdown documentation](assets/demo.gif)
+
+<sub>Demo built with <a href="https://github.com/ofershap/remotion-readme-kit">remotion-readme-kit</a></sub>
+
+## Why
+
+Tools like Context7 are great for looking up library docs from npm, but they don't help with your own documentation. Project wikis, internal knowledge bases, architecture decision records, onboarding guides: they all live as markdown files in your repo or on disk. The filesystem MCP server can read those files, but it treats them as raw text. It doesn't understand headings, sections, or code blocks. This server does. Point it at a directory and your assistant can search across all your docs, pull out a specific section by heading, list the table of contents, or find every TypeScript code example in your knowledge base.
 
 ## Tools
 
@@ -23,9 +29,9 @@ npx mcp-server-markdown
 | `list_files`       | List all .md files in a directory recursively (sorted alphabetically)      |
 | `search_docs`      | Full-text search across all .md files (case-insensitive, up to 50 results) |
 | `get_section`      | Extract a section by heading until the next heading of same/higher level   |
-| `list_headings`    | List all headings (#–######) as a table of contents                        |
+| `list_headings`    | List all headings as a table of contents                                   |
 | `find_code_blocks` | Find fenced code blocks, optionally filter by language (e.g. typescript)   |
-| `get_frontmatter`  | Parse YAML frontmatter metadata (key-value) at the start of a file         |
+| `get_frontmatter`  | Parse YAML frontmatter metadata at the start of a file                     |
 
 ## Quick Start
 
@@ -83,6 +89,7 @@ Add to user settings or `.vscode/mcp.json`:
 - "List all headings in CONTRIBUTING.md"
 - "Find all TypeScript code blocks in the docs"
 - "What's the frontmatter metadata in this file?"
+- "Give me the table of contents for our architecture docs"
 
 ## Development
 
