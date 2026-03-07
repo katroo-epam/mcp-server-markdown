@@ -9,14 +9,14 @@ Use this skill when you need to search documentation, extract sections, list hea
 
 ## Available Tools
 
-| Tool | What it does |
-|------|-------------|
-| `list_files` | List all .md files in a directory recursively |
-| `search_docs` | Full-text search across all .md files (case-insensitive, up to 50 results) |
-| `get_section` | Extract a section by heading until the next heading of same/higher level |
-| `list_headings` | List all headings as a table of contents |
-| `find_code_blocks` | Find fenced code blocks, optionally filter by language |
-| `get_frontmatter` | Parse YAML frontmatter metadata from a file |
+| Tool               | What it does                                                               |
+| ------------------ | -------------------------------------------------------------------------- |
+| `list_files`       | List all .md files in a directory recursively                              |
+| `search_docs`      | Full-text search across all .md files (case-insensitive, up to 50 results) |
+| `get_section`      | Extract a section by heading until the next heading of same/higher level   |
+| `list_headings`    | List all headings as a table of contents                                   |
+| `find_code_blocks` | Find fenced code blocks, optionally filter by language                     |
+| `get_frontmatter`  | Parse YAML frontmatter metadata from a file                                |
 
 ## Workflow
 
