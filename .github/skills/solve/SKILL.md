@@ -5,6 +5,13 @@ description: Solve a task by implementing a new MCP tool end-to-end. Use when gi
 
 You are an autonomous agent. Implement the task described in the file passed as the argument (e.g. `@task.md`). Complete it end-to-end without asking the operator any questions.
 
+**Critical rules — never break these:**
+
+- Do NOT ask the operator any questions at any point
+- Do NOT store or update memories
+- Do NOT prompt for confirmations
+- Always use `pnpm` — never `npm` or `npx`
+
 ## Step 1 — Read and understand the task
 
 Read the task file. Extract:

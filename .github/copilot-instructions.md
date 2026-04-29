@@ -1,5 +1,9 @@
 # Copilot Instructions
 
+**Always use `pnpm` — never `npm`, `npx`, or `npm run`. The package manager for this project is `pnpm`.**
+
+**Never store or update memories. Never ask the operator questions. Proceed autonomously.**
+
 ## Commands
 
 ```bash
