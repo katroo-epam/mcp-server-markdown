@@ -11,58 +11,27 @@ provided as the argument. Complete it end-to-end without asking the operator any
 
 ## Step 1 — Read and understand the task
 
-Read the task file passed as the argument. Extract:
+Read the task file passed as the argument. Extract and record:
 
-- What new function/tool needs to be added
-- The exact input schema (required and optional fields)
-- The exact output shape (field names, types, values)
+- The exact tool name to add
+- Input schema: required and optional fields with types
+- Output shape: exact field names, types, and values
 - All rules and edge cases listed in the task
+- Any examples provided
 
-## Step 2 — Understand the codebase
+## Step 2 — Implement using the add-tool skill
 
-Read these files before writing any code:
+Invoke the `add-tool` skill. Pass it the full task context you extracted in Step 1:
+the tool name, input schema, output shape, all rules, edge cases, and examples.
 
-- `src/markdown.ts` — understand existing function patterns
-- `src/index.ts` — understand how tools are registered
-- `tests/markdown.test.ts` — understand the test fixture pattern
+The `add-tool` skill owns the complete implementation workflow:
+reading the codebase → implementing the function in `src/markdown.ts` → registering
+the tool in `src/index.ts` → writing tests in `tests/markdown.test.ts` →
+running `bash scripts/verify.sh` → checking the spec checklist.
 
-Follow the patterns in `AGENTS.md` exactly.
+Do not start writing code yourself before invoking the skill.
 
-## Step 3 — Implement
-
-1. Add the new logic function to `src/markdown.ts`
-2. Add the `server.tool()` registration to `src/index.ts`
-3. Export the new function from `src/markdown.ts` (required for testing)
-
-Apply error handling conventions from `AGENTS.md`:
-
-- Fatal errors for invalid input (missing/non-directory path)
-- Per-item try/catch for individual file failures
-
-## Step 4 — Write tests
-
-Add tests to `tests/markdown.test.ts`:
-
-- Happy path: basic working input
-- Edge cases from the task spec
-- Error cases: invalid directory, missing files, empty directory
-- Boundary cases: empty results, large inputs
-
-Use the existing pattern: `fs.mkdtemp` in `beforeEach`, `fs.rm` in `afterEach`, real files only.
-
-## Step 5 — Verify
-
-Run the verification script:
-
-```bash
-bash scripts/verify.sh
-```
-
-This runs `pnpm install` → `pnpm typecheck` → `pnpm build` → `pnpm test` in sequence.
-If any step fails: fix the error, then re-run the script.
-Retry up to 3 times. Do not proceed until the script exits with code 0.
-
-## Step 6 — Independent code review
+## Step 3 — Independent code review
 
 Invoke the `Code Reviewer` agent, passing:
 
@@ -75,7 +44,7 @@ If the reviewer reports **ISSUES FOUND**:
 - Re-run `pnpm build && pnpm test`
 - Only proceed when the reviewer reports **PASS**
 
-## Step 7 — Done
+## Step 4 — Done
 
 Confirm completion with a summary:
 
