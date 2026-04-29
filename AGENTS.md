@@ -7,10 +7,10 @@ markdown-parsing tools over stdio to MCP clients (Claude, VS Code Copilot, Curso
 
 ## File Map
 
-| File | Role |
-|---|---|
-| `src/index.ts` | MCP server: tool registrations only, no logic |
-| `src/markdown.ts` | All file I/O and markdown parsing logic |
+| File                     | Role                                                |
+| ------------------------ | --------------------------------------------------- |
+| `src/index.ts`           | MCP server: tool registrations only, no logic       |
+| `src/markdown.ts`        | All file I/O and markdown parsing logic             |
 | `tests/markdown.test.ts` | Vitest tests — uses real tmp-dir fixtures, no mocks |
 
 ## How to Add a New Tool
@@ -21,7 +21,10 @@ Every new tool follows this two-step split:
 
 ```typescript
 // src/markdown.ts
-export interface MyResult { file: string; count: number; }
+export interface MyResult {
+  file: string;
+  count: number;
+}
 
 export async function myTool(directory: string): Promise<MyResult[]> {
   const absDir = path.resolve(directory);
@@ -48,7 +51,9 @@ server.tool(
   async ({ directory }) => {
     const absDir = path.resolve(directory);
     const results = await myTool(absDir);
-    return { content: [{ type: "text" as const, text: JSON.stringify(results) }] };
+    return {
+      content: [{ type: "text" as const, text: JSON.stringify(results) }],
+    };
   },
 );
 ```

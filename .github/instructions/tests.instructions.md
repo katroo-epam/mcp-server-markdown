@@ -58,6 +58,7 @@ describe("functionName", () => {
 ## Imports
 
 Always use `.js` extension on local imports:
+
 ```typescript
 import { yourFunction } from "../src/markdown.js";
 ```

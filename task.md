@@ -7,10 +7,12 @@ The MCP server should be able to scan a given folder, go through all markdown fi
 The output should be a simple list: file, line number, link type, text, and target URL. Something that can be plugged into automation — for example, a CI pipeline that checks documentation for broken links.
 
 # Goal
+
 Add an MCP tool called `find_links` to `mcp-server-markdown`.
 It scans markdown files under a directory and returns the links it finds as structured JSON.
 
 # Input
+
 ```json
 {
   "directory": "project/docs",
@@ -19,11 +21,14 @@ It scans markdown files under a directory and returns the links it finds as stru
   "includeExternal": true
 }
 ```
+
 - `directory` is required.
 - `validateLocal`, `includeImages`, and `includeExternal` are optional.
 
 # Output
+
 Return JSON in this shape:
+
 ```json
 {
   "links": [
@@ -39,11 +44,13 @@ Return JSON in this shape:
   ]
 }
 ```
+
 Each item in `links` has `file`, `line`, `column`, `kind`, `text`, `target`, and `status`.
 `kind` is `link`, `image`, or `reference`.
 `status` is `ok`, `missing_file`, `missing_anchor`, `external`, or `skipped`.
 
 # Rules
+
 - Scan markdown files recursively under `directory` and return the links it finds as structured JSON.
 - Return `file` paths relative to `directory`, with `line` and `column` as 1-based positions.
 - Support inline links, inline images, and full reference links. Return records for link usages in markdown content, not for reference definition lines.
@@ -57,7 +64,9 @@ Each item in `links` has `file`, `line`, `column`, `kind`, `text`, `target`, and
 - A bad file or bad record must not fail the whole call.
 
 # Examples
+
 File tree:
+
 ```text
 docs/
   api.md
@@ -68,6 +77,7 @@ docs/
 ```
 
 Input:
+
 ```json
 {
   "directory": "docs",
@@ -78,6 +88,7 @@ Input:
 ```
 
 `docs/guides/intro.md`:
+
 ```md
 See [API](../api.md#intro)
 ![Logo](../logo.png)
@@ -88,6 +99,7 @@ See [API](../api.md#intro)
 ```
 
 Expected result:
+
 ```json
 {
   "links": [
@@ -132,6 +144,7 @@ Expected result:
 ```
 
 File tree:
+
 ```text
 docs/
   target.md
@@ -140,6 +153,7 @@ docs/
 ```
 
 Input:
+
 ```json
 {
   "directory": "docs",
@@ -150,11 +164,13 @@ Input:
 ```
 
 `docs/target.md`:
+
 ```md
 # anchor
 ```
 
 `docs/guides/intro.md`:
+
 ```md
 [Good](../target.md#anchor)
 [Missing file](../missing.md)

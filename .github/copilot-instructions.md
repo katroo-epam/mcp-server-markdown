@@ -14,11 +14,13 @@ pnpm test:coverage   # vitest run --coverage
 ```
 
 Run a single test file:
+
 ```bash
 pnpm exec vitest run tests/markdown.test.ts
 ```
 
 Run a single `describe` block or `it` by name pattern:
+
 ```bash
 pnpm exec vitest run -t "listMarkdownFiles"
 ```

@@ -48,7 +48,7 @@ import { yourFunction } from "./markdown.js";
 
 // 2. Add a server.tool() call — keep it in the same order as the function in markdown.ts
 server.tool(
-  "your_tool_name",        // must match task spec exactly
+  "your_tool_name", // must match task spec exactly
   "Clear description.",
   {
     directory: z.string().describe("Path to the directory"),
@@ -57,7 +57,9 @@ server.tool(
   async ({ directory, optionalParam }) => {
     const absDir = path.resolve(directory);
     const result = await yourFunction(absDir, optionalParam);
-    return { content: [{ type: "text" as const, text: JSON.stringify(result) }] };
+    return {
+      content: [{ type: "text" as const, text: JSON.stringify(result) }],
+    };
   },
 );
 ```

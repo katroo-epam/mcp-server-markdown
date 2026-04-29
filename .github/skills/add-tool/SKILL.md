@@ -13,6 +13,7 @@ It covers the full workflow: spec → implement → test → verify → review.
 ### 1. Parse the task spec
 
 Read the task file and extract:
+
 - **Tool name** — the exact string to use in `server.tool()`
 - **Input schema** — required fields and optional fields (with types)
 - **Output shape** — exact field names, types, and values
@@ -30,6 +31,7 @@ tests/markdown.test.ts ← understand test fixture pattern
 ### 3. Implement — two-file split (always)
 
 **`src/markdown.ts`** — add the logic function:
+
 ```typescript
 export interface YourResult {
   // fields matching the task output spec exactly
@@ -58,13 +60,14 @@ export async function yourFunction(
 ```
 
 **`src/index.ts`** — register the tool:
+
 ```typescript
 // Add to imports at the top
 import { yourFunction } from "./markdown.js";
 
 // Add server.tool() call
 server.tool(
-  "tool_name",           // must match task spec exactly
+  "tool_name", // must match task spec exactly
   "Clear description.",
   {
     directory: z.string().describe("Path to directory"),
@@ -73,7 +76,9 @@ server.tool(
   async ({ directory, optionalFlag }) => {
     const absDir = path.resolve(directory);
     const result = await yourFunction(absDir, optionalFlag);
-    return { content: [{ type: "text" as const, text: JSON.stringify(result) }] };
+    return {
+      content: [{ type: "text" as const, text: JSON.stringify(result) }],
+    };
   },
 );
 ```
@@ -95,6 +100,7 @@ describe("yourFunction", () => {
 ```
 
 Always use real tmp files — never mock `fs`. Pattern:
+
 ```typescript
 beforeEach(async () => {
   tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "mcp-test-"));
@@ -124,23 +130,23 @@ Fix any errors and re-run until it exits 0.
 
 ## Key Rules
 
-| Rule | Detail |
-|---|---|
-| `.js` imports | Always `"./markdown.js"`, never `.ts` |
-| `as const` | Required on `type: "text"` in tool response |
-| Array guards | `arr[i]` is `T \| undefined` — always check before use |
-| Path safety | Always `path.resolve()` before any `fs` call |
-| Error levels | Fatal = bad input (throw); Per-item = bad file (catch + continue) |
+| Rule          | Detail                                                            |
+| ------------- | ----------------------------------------------------------------- |
+| `.js` imports | Always `"./markdown.js"`, never `.ts`                             |
+| `as const`    | Required on `type: "text"` in tool response                       |
+| Array guards  | `arr[i]` is `T \| undefined` — always check before use            |
+| Path safety   | Always `path.resolve()` before any `fs` call                      |
+| Error levels  | Fatal = bad input (throw); Per-item = bad file (catch + continue) |
 
 ## Spec Template
 
 Use this to capture the task before implementing:
 
 ```
-Tool name: 
-Input (required): 
-Input (optional): 
-Output shape: 
+Tool name:
+Input (required):
+Input (optional):
+Output shape:
 Rules:
   1.
   2.
