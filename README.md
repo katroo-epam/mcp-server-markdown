@@ -97,13 +97,15 @@ This repository includes a GitHub Copilot CLI workflow for implementing new MCP 
 
 ### One-time setup (per machine)
 
-Open GitHub Copilot CLI in the repo directory and run:
+Open GitHub Copilot CLI **in the repo directory** and run:
 
 ```
 /allow-all
 ```
 
-This pre-approves all tool permissions (file reads/writes, shell commands) for this repo so the agent can run without prompting during the solve run.
+The CLI tracks approvals per command type (e.g. `bash`, `pnpm install`, `pnpm build`, `pnpm test` are all separate entries). `/allow-all` adds a wildcard that pre-approves **all** tool permissions for this repo — file writes, bash scripts, and every pnpm command — so the agent never stops to ask during the solve run.
+
+> **Note:** This must be run from the repo directory so the approval is scoped to this repo's path. It persists across sessions, so you only need to do it once per machine.
 
 ### Running the workflow
 
