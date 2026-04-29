@@ -91,14 +91,38 @@ Add to user settings or `.vscode/mcp.json`:
 - "What's the frontmatter metadata in this file?"
 - "Give me the table of contents for our architecture docs"
 
+## Agentic Workflow
+
+This repository includes a GitHub Copilot CLI workflow for implementing new MCP tools autonomously.
+
+### One-time setup (per machine)
+
+Open GitHub Copilot CLI in the repo directory and run:
+
+```
+/allow-all
+```
+
+This pre-approves all tool permissions (file reads/writes, shell commands) for this repo so the agent can run without prompting during the solve run.
+
+### Running the workflow
+
+```
+/solve @task.md
+```
+
+The agent will implement the task end-to-end: reading the spec, writing code, writing tests, verifying the build, and running an independent code review — all without operator input.
+
+> **Note:** Without the `/allow-all` pre-setup, the CLI will prompt for bash command approval mid-run, which interrupts the autonomous workflow.
+
 ## Development
 
 ```bash
 git clone https://github.com/ofershap/mcp-server-markdown.git
 cd mcp-server-markdown
-npm install
-npm test
-npm run build
+pnpm install
+pnpm test
+pnpm build
 ```
 
 ## See also
