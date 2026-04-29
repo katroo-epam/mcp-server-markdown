@@ -20,6 +20,9 @@ You are editing the MCP server source. Follow these rules exactly.
 
 ## Adding a new function to src/markdown.ts
 
+Input may be a directory, a file path, a string, or multiple parameters — match the task spec.
+Do not assume directory input or array output unless the spec says so.
+
 ```typescript
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -29,18 +32,34 @@ export interface YourResult {
   // ... fields matching the task output spec exactly
 }
 
-export async function yourFunction(directory: string): Promise<YourResult[]> {
+export async function yourFunction(
+  // params matching the task input spec
+): Promise<YourResult[] | YourResult> {
+  // For directory input:
   const absDir = path.resolve(directory);
   const stat = await fs.stat(absDir);
   if (!stat.isDirectory()) {
     throw new Error(`Not a directory: ${directory}`);
   }
-  // ... implementation
+  // For file input:
+  // const absFile = path.resolve(filePath);
+  // const stat = await fs.stat(absFile);
+  // if (!stat.isFile()) throw new Error(`Not a file: ${filePath}`);
   return results;
 }
 ```
 
+## Modifying an existing function in src/markdown.ts
+
+1. Read the full existing function before making any changes.
+2. Apply the minimal diff required by the task spec.
+3. Preserve all existing behavior unless the spec explicitly changes it.
+4. New optional parameters must default to the old behavior.
+
 ## Adding a tool registration to src/index.ts
+
+Output rendering must match what the task spec implies. Check existing tools:
+some use `JSON.stringify`, some join lines with `"\n"`, some use sentinel text like `"(no matches)"`.
 
 ```typescript
 // 1. Add to the import block at the top
@@ -51,14 +70,13 @@ server.tool(
   "your_tool_name", // must match task spec exactly
   "Clear description.",
   {
-    directory: z.string().describe("Path to the directory"),
-    optionalParam: z.boolean().optional().describe("Optional flag"),
+    // required params: z.type().describe(...)
+    // optional params: z.type().optional().describe(...)
   },
-  async ({ directory, optionalParam }) => {
-    const absDir = path.resolve(directory);
-    const result = await yourFunction(absDir, optionalParam);
+  async ({ /* all params */ }) => {
+    const result = await yourFunction(/* params */);
     return {
-      content: [{ type: "text" as const, text: JSON.stringify(result) }],
+      content: [{ type: "text" as const, text: /* rendered output */ }],
     };
   },
 );
@@ -66,11 +84,11 @@ server.tool(
 
 ## Error handling
 
-- **Invalid input** (bad path, not a directory): throw `new Error(...)` — MCP SDK converts it automatically.
+- **Invalid input** (bad path, not a directory, not a file): throw `new Error(...)` — MCP SDK converts it automatically.
 - **Per-file errors**: wrap in `try/catch` and `continue` — never let one bad file fail the whole call.
 
 ## Security
 
 - Always call `path.resolve()` on user-supplied paths before passing to `fs`.
 - Never concatenate user input directly into shell commands.
-- Validate that the resolved path is a directory before iterating it.
+- Validate that the resolved path is the expected type (directory, file) before using it.

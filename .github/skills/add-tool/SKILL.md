@@ -5,8 +5,11 @@ description: Add a new tool to the mcp-server-markdown MCP server. Use when a ta
 
 # Add a New MCP Tool
 
-Use this skill when you need to implement a new tool in `mcp-server-markdown`.
+Use this skill when you need to implement a **new** tool in `mcp-server-markdown` that does not yet exist.
 It covers the full workflow: spec → implement → test → verify → review.
+
+> If the tool already exists and you need to modify it, do **not** use this skill.
+> Follow the modification path in the `solve` skill instead.
 
 ## Workflow
 
@@ -17,20 +20,24 @@ Read the task file and extract:
 - **Tool name** — the exact string to use in `server.tool()`
 - **Input schema** — required fields and optional fields (with types)
 - **Output shape** — exact field names, types, and values
+- **Transport format** — how `src/index.ts` should render the output as MCP text
+  (JSON.stringify, newline-joined list, custom text, etc. — check existing tools for the pattern
+  that matches your output type)
 - **Rules** — every constraint listed; check each one during implementation
 - **Examples** — use them as test cases
 
 ### 2. Read the codebase before writing any code
 
 ```
-src/markdown.ts      ← understand existing function patterns
-src/index.ts         ← understand tool registration pattern
+src/markdown.ts        ← understand existing function patterns
+src/index.ts           ← understand tool registration AND output rendering patterns
 tests/markdown.test.ts ← understand test fixture pattern
 ```
 
 ### 3. Implement — two-file split (always)
 
-**`src/markdown.ts`** — add the logic function:
+**`src/markdown.ts`** — add the logic function. Input may be a directory, a file path,
+a string, or multiple parameters — match the task spec exactly, not the boilerplate:
 
 ```typescript
 export interface YourResult {
@@ -38,28 +45,23 @@ export interface YourResult {
 }
 
 export async function yourFunction(
-  directory: string,
-  // optional params last
-): Promise<YourResult[]> {
-  const absDir = path.resolve(directory);
-  const stat = await fs.stat(absDir);
-  if (!stat.isDirectory()) throw new Error(`Not a directory: ${directory}`);
+  // params matching the task input spec — could be directory, filePath, query, flags, etc.
+): Promise<YourResult[] | YourResult> {
+  // For directory input:
+  //   const absDir = path.resolve(directory);
+  //   const stat = await fs.stat(absDir);
+  //   if (!stat.isDirectory()) throw new Error(`Not a directory: ${directory}`);
+  // For file input:
+  //   const absFile = path.resolve(filePath);
+  //   const stat = await fs.stat(absFile);
+  //   if (!stat.isFile()) throw new Error(`Not a file: ${filePath}`);
 
-  const files = await listMarkdownFiles(absDir);
-  const results: YourResult[] = [];
-
-  for (const file of files) {
-    try {
-      // per-file logic
-    } catch {
-      continue; // skip bad files, never fail the whole call
-    }
-  }
+  // Per-file iteration: wrap each in try/catch and continue on error
   return results;
 }
 ```
 
-**`src/index.ts`** — register the tool:
+**`src/index.ts`** — register the tool. Render output to match the transport format from Step 1:
 
 ```typescript
 // Add to imports at the top
@@ -70,14 +72,14 @@ server.tool(
   "tool_name", // must match task spec exactly
   "Clear description.",
   {
-    directory: z.string().describe("Path to directory"),
-    optionalFlag: z.boolean().optional().describe("Optional flag"),
+    // required params: z.type().describe(...)
+    // optional params: z.type().optional().describe(...)
   },
-  async ({ directory, optionalFlag }) => {
-    const absDir = path.resolve(directory);
-    const result = await yourFunction(absDir, optionalFlag);
+  async ({ /* all params */ }) => {
+    const result = await yourFunction(/* params */);
+    // render output — JSON.stringify, join("\n"), or custom text — match the spec
     return {
-      content: [{ type: "text" as const, text: JSON.stringify(result) }],
+      content: [{ type: "text" as const, text: /* rendered output */ }],
     };
   },
 );
@@ -90,8 +92,8 @@ Add a `describe` block to `tests/markdown.test.ts`:
 ```typescript
 describe("yourFunction", () => {
   it("returns expected results for valid input", async () => { ... });
-  it("returns empty array for empty directory", async () => { ... });
-  it("throws when directory does not exist", async () => {
+  it("returns empty result for empty input", async () => { ... });
+  it("throws when input does not exist", async () => {
     await expect(yourFunction("/nonexistent")).rejects.toThrow();
   });
   it("skips bad files without failing", async () => { ... });
@@ -123,7 +125,8 @@ Fix any errors and re-run until it exits 0.
 - [ ] Tool name matches task spec exactly
 - [ ] All required inputs present in Zod schema
 - [ ] All optional inputs marked `.optional()`
-- [ ] Output JSON shape matches spec exactly (field names, types)
+- [ ] Output JSON shape (or text format) matches spec exactly (field names, types)
+- [ ] Transport rendering in `src/index.ts` matches what the spec implies
 - [ ] Every rule from the task is implemented
 - [ ] All task examples produce correct output
 - [ ] No existing tests broken
@@ -147,6 +150,7 @@ Tool name:
 Input (required):
 Input (optional):
 Output shape:
+Transport format:
 Rules:
   1.
   2.
