@@ -93,7 +93,57 @@ Add to user settings or `.vscode/mcp.json`:
 
 ## Agentic Workflow
 
-This repository includes a GitHub Copilot CLI workflow for implementing new MCP tools autonomously.
+This repository includes a GitHub Copilot CLI multi-agent workflow for implementing new MCP tools autonomously — from spec to verified, reviewed code — with zero operator input after the start command.
+
+### Architecture
+
+```
+Operator
+   │
+   └─ /solve @task.md
+         │
+         ▼
+   ┌─────────────────────────────────────────────────────┐
+   │  Orchestrator  (.github/prompts/solve.prompt.md)    │
+   │  Entry point — delegates everything to solve skill  │
+   └──────────────────────┬──────────────────────────────┘
+                          │ invokes
+                          ▼
+   ┌─────────────────────────────────────────────────────┐
+   │  solve skill  (.github/skills/solve/SKILL.md)       │
+   │                                                     │
+   │  Step 1 — Parse task spec (tool name, I/O, rules)   │
+   │  Step 2 — Read codebase, detect new vs. modify      │
+   │  Step 3 — Implement in src/markdown.ts + index.ts   │
+   │  Step 4 — Write tests in tests/markdown.test.ts     │
+   │  Step 5 — Run bash scripts/verify.sh (exit 0)       │
+   │  Step 6 — Invoke Code Reviewer ──────────────────┐  │
+   │  Step 7 — Report results                         │  │
+   └──────────────────────────────────────────────────┼──┘
+                                                      │ spawns
+                                                      ▼
+                          ┌───────────────────────────────────┐
+                          │  Code Reviewer agent              │
+                          │  (.github/agents/review.agent.md) │
+                          │                                   │
+                          │  Independent — reads, never edits │
+                          │  Checks: correctness, security,   │
+                          │  edge cases, style, test coverage │
+                          │                                   │
+                          │  Returns: PASS | ISSUES FOUND     │
+                          └───────────────────────────────────┘
+```
+
+If the Code Reviewer returns **ISSUES FOUND**, the `solve` skill fixes each issue and re-runs `verify.sh` before completing.
+
+### Instruction files
+
+| File | Purpose |
+|---|---|
+| `.github/copilot-instructions.md` | Global rules: commands, architecture, key conventions |
+| `.github/instructions/src.instructions.md` | Source file rules (applied to `src/**`) |
+| `.github/instructions/tests.instructions.md` | Test conventions and edge-case checklist (applied to `tests/**`) |
+| `AGENTS.md` | Full project conventions reference for all agents |
 
 ### One-time setup (per machine)
 
@@ -116,6 +166,25 @@ The CLI tracks approvals per command type (e.g. `bash`, `pnpm install`, `pnpm bu
 The agent will implement the task end-to-end: reading the spec, writing code, writing tests, verifying the build, and running an independent code review — all without operator input.
 
 > **Note:** Without the `/allow-all` pre-setup, the CLI will prompt for bash command approval mid-run, which interrupts the autonomous workflow.
+
+### What the workflow produces
+
+After a successful run, the agent will have:
+
+1. Added a new exported function to `src/markdown.ts` with all logic
+2. Registered the tool in `src/index.ts` via `server.tool()`
+3. Added a `describe` block to `tests/markdown.test.ts` covering happy path, edge cases, and error handling
+4. Passed `pnpm typecheck`, `pnpm build`, `pnpm test`, and `pnpm lint`
+5. Received a **PASS** from the independent Code Reviewer agent
+
+### Interpreting results
+
+| Signal | Meaning |
+|---|---|
+| `verify.sh` exits 0 | Build, types, and all tests pass |
+| Code Reviewer returns `PASS` | Implementation is correct, secure, and well-tested |
+| Code Reviewer returns `ISSUES FOUND` | Agent will self-correct and re-verify before finishing |
+| Agent asks a question | Should not happen — if it does, it incurs a penalty per contest rules |
 
 ## Development
 
