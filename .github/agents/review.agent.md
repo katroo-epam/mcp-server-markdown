@@ -32,7 +32,7 @@ Always read:
 - [ ] Optional fields marked `.optional()` in the schema
 - [ ] Output shape (JSON structure or text format) matches the task spec exactly
 - [ ] Transport rendering in `src/index.ts` matches what the spec implies
-  (e.g., `JSON.stringify`, newline-joined text, sentinel strings like `"(no matches)"`)
+      (e.g., `JSON.stringify`, newline-joined text, sentinel strings like `"(no matches)"`)
 - [ ] All rules from the task are implemented (check each rule line by line)
 - [ ] Examples in the task produce the expected output
 

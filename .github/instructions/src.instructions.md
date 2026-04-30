@@ -32,9 +32,8 @@ export interface YourResult {
   // ... fields matching the task output spec exactly
 }
 
-export async function yourFunction(
+export async function yourFunction(): Promise<YourResult[] | YourResult> {
   // params matching the task input spec
-): Promise<YourResult[] | YourResult> {
   // For directory input:
   const absDir = path.resolve(directory);
   const stat = await fs.stat(absDir);

@@ -52,9 +52,8 @@ export interface YourResult {
   // fields matching the task output spec exactly
 }
 
-export async function yourFunction(
+export async function yourFunction(): Promise<YourResult[] | YourResult> {
   // params matching the task input schema exactly — directory, filePath, query, flags, etc.
-): Promise<YourResult[] | YourResult> {
   // validate input:
   //   directory → path.resolve + stat → isDirectory check
   //   file      → path.resolve + stat → isFile check

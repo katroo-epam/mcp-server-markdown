@@ -138,12 +138,12 @@ If the Code Reviewer returns **ISSUES FOUND**, the `solve` skill fixes each issu
 
 ### Instruction files
 
-| File | Purpose |
-|---|---|
-| `.github/copilot-instructions.md` | Global rules: commands, architecture, key conventions |
-| `.github/instructions/src.instructions.md` | Source file rules (applied to `src/**`) |
+| File                                         | Purpose                                                          |
+| -------------------------------------------- | ---------------------------------------------------------------- |
+| `.github/copilot-instructions.md`            | Global rules: commands, architecture, key conventions            |
+| `.github/instructions/src.instructions.md`   | Source file rules (applied to `src/**`)                          |
 | `.github/instructions/tests.instructions.md` | Test conventions and edge-case checklist (applied to `tests/**`) |
-| `AGENTS.md` | Full project conventions reference for all agents |
+| `AGENTS.md`                                  | Full project conventions reference for all agents                |
 
 ### One-time setup (per machine)
 
@@ -179,12 +179,12 @@ After a successful run, the agent will have:
 
 ### Interpreting results
 
-| Signal | Meaning |
-|---|---|
-| `verify.sh` exits 0 | Build, types, and all tests pass |
-| Code Reviewer returns `PASS` | Implementation is correct, secure, and well-tested |
-| Code Reviewer returns `ISSUES FOUND` | Agent will self-correct and re-verify before finishing |
-| Agent asks a question | Should not happen — if it does, it incurs a penalty per contest rules |
+| Signal                               | Meaning                                                               |
+| ------------------------------------ | --------------------------------------------------------------------- |
+| `verify.sh` exits 0                  | Build, types, and all tests pass                                      |
+| Code Reviewer returns `PASS`         | Implementation is correct, secure, and well-tested                    |
+| Code Reviewer returns `ISSUES FOUND` | Agent will self-correct and re-verify before finishing                |
+| Agent asks a question                | Should not happen — if it does, it incurs a penalty per contest rules |
 
 ## Development
 
